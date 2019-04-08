@@ -5,9 +5,9 @@ const BETTING = false;
 // The base amount you are betting.  This is where bets start at, and is how much we increment them
 const BASE_BET = 1;
 // This is the amount of profit you want to get.  If you bet 1, you want to get paid 1.25 when successful.
-const BASE_PROFIT_PERC = 0.25;
+const BASE_PROFIT_PERC = 0.33;
 // When we win a round, what should our profit increase be? 1 = 100% increase
-const WIN_PROFIT_INCREASE = 1;
+const WIN_PROFIT_INCREASE = 0.75;
 // When we lose a round, what should our profit increase be? 1 = 100% increase
 const LOSS_PROFIT_INCREASE = 0;
 // This is the least amount we will ever cashout at
@@ -17,7 +17,7 @@ const MAX_CASHOUT = 20;
 // This is the maximum bet you are willing to tolerate
 const MAX_BET = 50;
 // This is the maximum amount of loss you are willing to accept in a losing streak (before reverting to minimum bets/cashouts again)
-const MAX_LOSS = 500;
+const MAX_COST = 500;
 
 // -- don't change me
 let inGame = false;
@@ -74,7 +74,6 @@ function onStarted() {
 function onEnded() {
 	if (inGame !== true) { return; }
 	inGame = false;
-	console.log('Game crashed at ' + engine.multiplier);
 	history.push(engine.multiplier);
 
 	if (BETTING === true) {
@@ -91,6 +90,28 @@ function onEnded() {
 		} else {
 			onLose();
 		}
+	}
+
+	if (bet > MAX_BET) {
+		console.error(`!!! Bet: ${bet} is greater than max bet: ${MAX_BET}.  Resetting to base...`);
+		cost = 0;
+		bet = BASE_BET;
+		profitMargin = BASE_PROFIT_PERC;
+		cashOut = 1 * (1 + profitMargin);
+	}
+	if (cashOut > MAX_CASHOUT) {
+		console.error(`!!! Cashout: ${cashOut} is greater than max cashout: ${MAX_CASHOUT}.  Resetting to base...`);
+		cost = 0;
+		bet = BASE_BET;
+		profitMargin = BASE_PROFIT_PERC;
+		cashOut = 1 * (1 + profitMargin);
+	}
+	if (cost > MAX_COST) {
+		console.error(`!!! Cost: ${cashOut} is greater than max cost: ${MAX_COST}.  Resetting to base...`);
+		cost = 0;
+		bet = BASE_BET;
+		profitMargin = BASE_PROFIT_PERC;
+		cashOut = 1 * (1 + profitMargin);
 	}
 }
 
@@ -112,6 +133,6 @@ function onLose() {
 	profitMargin = BASE_PROFIT_PERC;
 	// increase bets every other round of losses
 	bet += streak % 2 === 0 ? BASE_BET : 0;
-	const desiredProfit = (cost + bet) * profitMargin;
+	const desiredProfit = (cost + bet) * (1 + profitMargin);
 	cashOut = desiredProfit / bet >= MIN_CASHOUT ? desiredProfit / bet : MIN_CASHOUT;
 }
