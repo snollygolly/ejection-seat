@@ -53,21 +53,21 @@ engine.onUpdate = function(prevState) {
 // You can bet here
 function onStarting() {
 	inGame = true;
-	console.log(`\n\n${BETTING === true ? "+" : "?"} Placed bet: ${bet} @ ${cashOut} for ${bet * cashOut} return [cost: ${cost}]`);
+	cost += bet;
+	console.log(`\n\n${BETTING === true ? "+" : "?"} Placed bet: ${bet.toFixed(0)} @ ${cashOut.toFixed(2)} for ${(bet * cashOut).toFixed(2)} return [cost: ${cost.toFixed(2)}]`);
 	if (engine.balance >= bet) {
 		// place bet
 		if (BETTING === true) {
 			engine.placeBet(bet, cashOut).catch(console.error);
 		}
 	}
-	cost += bet;
 	total -= bet;
 }
 
 // Cashout when you want or wait for auto cashout
 function onStarted() {
 	if (inGame !== true) { return; }
-	console.log(`--- No More Bets --- [total: ${total}]`);
+	console.log(`--- No More Bets --- [total: ${total.toFixed(2)}]`);
 }
 
 // Do some analyse from results and adjust your next strategy
@@ -93,21 +93,21 @@ function onEnded() {
 	}
 
 	if (bet > MAX_BET) {
-		console.error(`!!! Bet: ${bet} is greater than max bet: ${MAX_BET}.  Resetting to base...`);
+		console.error(`!!! Bet: ${bet.toFixed(0)} is greater than max bet: ${MAX_BET}.  Resetting to base...`);
 		cost = 0;
 		bet = BASE_BET;
 		profitMargin = BASE_PROFIT_PERC;
 		cashOut = 1 * (1 + profitMargin);
 	}
 	if (cashOut > MAX_CASHOUT) {
-		console.error(`!!! Cashout: ${cashOut} is greater than max cashout: ${MAX_CASHOUT}.  Resetting to base...`);
+		console.error(`!!! Cashout: ${cashOut.toFixed(0)} is greater than max cashout: ${MAX_CASHOUT}.  Resetting to base...`);
 		cost = 0;
 		bet = BASE_BET;
 		profitMargin = BASE_PROFIT_PERC;
 		cashOut = 1 * (1 + profitMargin);
 	}
 	if (cost > MAX_COST) {
-		console.error(`!!! Cost: ${cashOut} is greater than max cost: ${MAX_COST}.  Resetting to base...`);
+		console.error(`!!! Cost: ${cashOut.toFixed(0)} is greater than max cost: ${MAX_COST}.  Resetting to base...`);
 		cost = 0;
 		bet = BASE_BET;
 		profitMargin = BASE_PROFIT_PERC;
@@ -118,7 +118,7 @@ function onEnded() {
 function onWin() {
 	streak = 0;
 	// reset the bet, but increase the profit target
-	console.log(`${BETTING === true ? "+" : "?"} You survived!\nBailed @ ${cashOut} / Crashed @ ${engine.multiplier} - Got ${bet * cashOut} (+${(bet * cashOut) - bet}) [cost: ${cost}]`);
+	console.log(`${BETTING === true ? "+" : "?"} You survived!\nBailed @ ${cashOut.toFixed(2)} / Crashed @ ${engine.multiplier} - Got ${(bet * cashOut).toFixed(2)} (+${((bet * cashOut) - bet).toFixed(2)}) [cost: ${cost.toFixed(2)}]`);
 	total += (bet * cashOut);
 	cost = 0;
 	bet = BASE_BET;
@@ -128,7 +128,7 @@ function onWin() {
 
 function onLose() {
 	streak++;
-	console.log(`${BETTING === true ? "+" : "?"} You lost!\nCrashed @ ${engine.multiplier} - Lost ${bet} [cost: ${cost}]`);
+	console.log(`${BETTING === true ? "+" : "?"} You lost!\nCrashed @ ${engine.multiplier} - Lost ${bet.toFixed(0)} [cost: ${cost.toFixed(2)}]`);
 	// reset the profit margin to base when we lose, recoup losses
 	profitMargin = BASE_PROFIT_PERC;
 	// increase bets every other round of losses
