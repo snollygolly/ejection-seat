@@ -1,13 +1,14 @@
+// -- Moonlander's --
 // Low and Slow - v1
 
 // This is the setting for engaging betting (as opposed to just simulating)
 const BETTING = false;
 // The base amount you are betting.  This is where bets start at, and is how much we increment them
 const BASE_BET = 1;
-// This is the amount of profit you want to get.  If you bet 1, you want to get paid 1.25 when successful.
-const BASE_PROFIT_PERC = 0.30;
+// This is the amount of profit you want to get.  If you bet 1, you want to get paid 1 + perc when successful.
+const BASE_PROFIT_PERC = 0.75;
 // When we lose a round, what should our new profit percentage be.
-const LOSS_PROFIT_PERC = BASE_PROFIT_PERC / 2;
+const LOSS_PROFIT_PERC = BASE_PROFIT_PERC / 5;
 // When we win a round, what should our profit increase be? 1 = 100% increase
 const WIN_PROFIT_INCREASE = 0.75;
 // This is the least amount we will ever cashout at
