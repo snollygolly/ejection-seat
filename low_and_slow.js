@@ -6,10 +6,10 @@ const BETTING = false;
 const BASE_BET = 1;
 // This is the amount of profit you want to get.  If you bet 1, you want to get paid 1.25 when successful.
 const BASE_PROFIT_PERC = 0.30;
+// When we lose a round, what should our new profit percentage be.
+const LOSS_PROFIT_PERC = BASE_PROFIT_PERC / 2;
 // When we win a round, what should our profit increase be? 1 = 100% increase
 const WIN_PROFIT_INCREASE = 0.75;
-// When we lose a round, what should our profit increase be? 1 = 100% increase
-const LOSS_PROFIT_INCREASE = -0.5;
 // This is the least amount we will ever cashout at
 const MIN_CASHOUT = 1.1;
 // This is the maximum amount of cashout you are willing to tolerate.
@@ -136,6 +136,6 @@ function onLose() {
 	profitMargin = BASE_PROFIT_PERC;
 	// increase bets every other round of losses
 	bet += streak % 2 === 1 ? BASE_BET : 0;
-	const desiredProfit = (cost + bet) * (1 + profitMargin);
+	const desiredProfit = (cost + bet) * (1 + LOSS_PROFIT_PERC);
 	cashOut = desiredProfit / bet >= MIN_CASHOUT ? desiredProfit / bet : MIN_CASHOUT;
 }
