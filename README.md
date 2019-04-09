@@ -1,6 +1,13 @@
 # ejection-seat
 A tool to help you get out of the rocket while you still can.
 
+## Donations
+Won a lot? Love the script? Lost a lot but still want to show me love?  Consider donating?
+
+BTC - *1E6Vyh84pTEP9v6Sh8Yzm693pBZLvguX3m*
+ETH - *0xb2921b476838c8DB9a29d708B3cA8c11959D7c7D*
+LTC - *LfkD8jcgv4E2rDta4hA2CUHNMiPGdZL1yr*`
+
 ## Scripts
 `moonscript.js` is the older version of the script, it's not advised to use it.
 `low_and_slow.js` is the newest version that should be used.
@@ -21,8 +28,8 @@ There are a number of configuration options available to you in `low_and_slow`:
 `WIN_PROFIT_INCREASE`
 - When we win, how much should we increase our profit goal. 1 = 100% increase
 
-`LOSS_PROFIT_INCREASE`
-- Unused
+`LOSS_PROFIT_PERC`
+- How much profit you want to try and get after a loss. 0.25 = 25% profit
 
 `MIN_CASHOUT`
 - The minimum cashout amount
