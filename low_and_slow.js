@@ -67,7 +67,7 @@ function onStarting() {
 // Cashout when you want or wait for auto cashout
 function onStarted() {
 	if (inGame !== true) { return; }
-	console.log(`--- No More Bets --- [total: ${total.toFixed(2)}]`);
+	console.log(`--- No More Bets ---\n[total: ${total.toFixed(2)}]`);
 }
 
 // Do some analyse from results and adjust your next strategy
@@ -92,15 +92,18 @@ function onEnded() {
 		}
 	}
 
+	if (cashOut > MAX_CASHOUT) {
+		console.error(`!!! Cashout: ${cashOut.toFixed(0)} is greater than max cashout: ${MAX_CASHOUT}.  Increasing bet...`);
+		while (cashOut > MAX_CASHOUT) {
+			profitMargin = BASE_PROFIT_PERC;
+			// increase bets every other round of losses
+			bet += BASE_BET;
+			const desiredProfit = (cost + bet) * (1 + profitMargin);
+			cashOut = desiredProfit / bet >= MIN_CASHOUT ? desiredProfit / bet : MIN_CASHOUT;
+		}
+	}
 	if (bet > MAX_BET) {
 		console.error(`!!! Bet: ${bet.toFixed(0)} is greater than max bet: ${MAX_BET}.  Resetting to base...`);
-		cost = 0;
-		bet = BASE_BET;
-		profitMargin = BASE_PROFIT_PERC;
-		cashOut = 1 * (1 + profitMargin);
-	}
-	if (cashOut > MAX_CASHOUT) {
-		console.error(`!!! Cashout: ${cashOut.toFixed(0)} is greater than max cashout: ${MAX_CASHOUT}.  Resetting to base...`);
 		cost = 0;
 		bet = BASE_BET;
 		profitMargin = BASE_PROFIT_PERC;
