@@ -4,9 +4,11 @@ A tool to help you get out of the rocket while you still can.
 ## Donations
 Won a lot? Love the script? Lost a lot but still want to show me love?  Consider donating?
 
-BTC - *1E6Vyh84pTEP9v6Sh8Yzm693pBZLvguX3m*
-ETH - *0xb2921b476838c8DB9a29d708B3cA8c11959D7c7D*
-LTC - *LfkD8jcgv4E2rDta4hA2CUHNMiPGdZL1yr*`
+```
+BTC - 1E6Vyh84pTEP9v6Sh8Yzm693pBZLvguX3m
+ETH - 0xb2921b476838c8DB9a29d708B3cA8c11959D7c7D
+LTC - LfkD8jcgv4E2rDta4hA2CUHNMiPGdZL1yr
+```
 
 ## Scripts
 `moonscript.js` is the older version of the script, it's not advised to use it.
