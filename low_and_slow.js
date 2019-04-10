@@ -14,11 +14,11 @@ const WIN_PROFIT_INCREASE = 0.75;
 // This is the least amount we will ever cashout at
 const MIN_CASHOUT = 1.1;
 // This is the maximum amount of cashout you are willing to tolerate.
-const MAX_CASHOUT = 20;
+const MAX_CASHOUT = 12;
 // This is the maximum bet you are willing to tolerate
-const MAX_BET = 50;
+const MAX_BET = 40;
 // This is the maximum amount of loss you are willing to accept in a losing streak (before reverting to minimum bets/cashouts again)
-const MAX_COST = 500;
+const MAX_COST = 350;
 
 // -- don't change me
 let inGame = false;
