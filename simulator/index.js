@@ -1,18 +1,25 @@
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
-const dump = require("./dump_1000000-2c19b84f6574cd7f5e69d676c6fda5a4b934e6492bdb762ecde07a2c861609b5.json");
 
-simulateFlatSingle(3500);
+//const dump = require("./dump_1000000-2c19b84f6574cd7f5e69d676c6fda5a4b934e6492bdb762ecde07a2c861609b5.json");
+const dump = require("./dump_250000-f2a6edbf01e482c3ff7b4f5633261e3f39de756373e3069b2a51241bfc0f6333.json");
 
-function simulateFlatSingle(cashout) {
+const results = simulateFlatSingle(2800, 60000);
+console.log(results);
+//simulateDump()
+
+
+function simulateFlatSingle(cashout, duration = dump.length) {
 	const wins = [];
 	const stats = {
+		cashout: cashout,
 		wallet: 5000,
 		highest: 5000,
 		lowest: 5000,
-		last: 0
+		last: 0,
+		shortest: duration,
+		longest: 0
 	};
-	const duration = dump.length
 	for (const [index, item] of dump.entries()) {
 		if (index > duration) {break;}
 		const crash = parseFloat(item.crash);
@@ -29,7 +36,6 @@ function simulateFlatSingle(cashout) {
 			}
 			wins.push((index - stats.last));
 			stats.last = index;
-			console.log(stats)
 		} else {
 			// we lost
 		}
@@ -43,15 +49,17 @@ function simulateFlatSingle(cashout) {
 	const delay = wins.reduce((acc, curr) => {
 		return acc + curr;
 	})
-
-	console.log(`Flat Single: ${cashout} / ${(duration / 4250).toFixed(2)} days (avg: ${delay / wins.length})`);
-	console.log(stats);
+	stats.avg = ((delay / wins.length) / 4250).toFixed(2);
+	stats.duration = (duration / 4250).toFixed(2);
+	//console.log(`Flat Single: ${cashout} / ${(duration / 4250).toFixed(2)} days (avg: ${((delay / wins.length) / 4250).toFixed(2)} days)`);
+	//console.log(stats);
+	return stats;
 }
 
 function simulateDump() {
-	const STARTING_CRASH = 1;
+	const STARTING_CRASH = 0;
 	const MAX_CRASH = 10000;
-	const INTERVAL = 10;
+	const INTERVAL = 100;
 	const stats = {};
 	let i = STARTING_CRASH;
 	while (i < MAX_CRASH) {
@@ -71,11 +79,24 @@ function simulateDump() {
 			}
 		}
 	}
+	const sortable = [];
 	for (const index in stats) {
-		if (stats[index] > 50000) {
-			console.log(`Cashout @ ${parseFloat(index).toFixed(2)}: Net Profit: ${(stats[index]).toFixed(2)}`);
+		sortable.push({
+			cashout: index,
+			profit: stats[index]
+		});
+	}
+	sortable.sort((a, b) => (a.profit < b.profit) ? 1 : -1);
+
+	const results = [];
+	for (const [index, item] of sortable.entries()) {
+		//console.log(`Cashout @ ${parseFloat(item.cashout).toFixed(2)}: Net Profit: ${(item.profit).toFixed(2)}`);
+		results.push(simulateFlatSingle(item.cashout));
+		if (index > 25) {
+			break;
 		}
 	}
+	console.log(results);
 }
 
 function scanDump() {
@@ -109,10 +130,9 @@ function scanDump() {
 	}
 }
 
-function refreshTable() {
+function refreshTable(amount) {
 	var hash = "f2a6edbf01e482c3ff7b4f5633261e3f39de756373e3069b2a51241bfc0f6333";
   var lastHash = "";
-  var amount = 1000000;
 
 	const output = [];
 	let total = 0;
