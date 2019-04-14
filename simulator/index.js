@@ -1,12 +1,12 @@
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
 
-//const dump = require("./dump_1000000-2c19b84f6574cd7f5e69d676c6fda5a4b934e6492bdb762ecde07a2c861609b5.json");
-const dump = require("./dump_250000-f2a6edbf01e482c3ff7b4f5633261e3f39de756373e3069b2a51241bfc0f6333.json");
+const dump = require("./dumps/dump_250000-921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1");
 
-const results = simulateFlatSingle(2800, 60000);
-console.log(results);
-//simulateDump()
+//refreshJSON("921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1", 250000)
+// const results = simulateFlatSingle(2900, 60000);
+// console.log(results);
+simulateDump()
 
 
 function simulateFlatSingle(cashout, duration = dump.length) {
@@ -49,6 +49,7 @@ function simulateFlatSingle(cashout, duration = dump.length) {
 	const delay = wins.reduce((acc, curr) => {
 		return acc + curr;
 	})
+	stats.score = (stats.longest * -1) + stats.lowest;
 	stats.avg = ((delay / wins.length) / 4250).toFixed(2);
 	stats.duration = (duration / 4250).toFixed(2);
 	//console.log(`Flat Single: ${cashout} / ${(duration / 4250).toFixed(2)} days (avg: ${((delay / wins.length) / 4250).toFixed(2)} days)`);
@@ -99,40 +100,8 @@ function simulateDump() {
 	console.log(results);
 }
 
-function scanDump() {
-	const stats = {
-		["1x"]: 0,
-		// below
-		["1.25x"]: 0,
-		["1.50x"]: 0,
-		["1.75x"]: 0,
-		["2x"]: 0,
-		// above
-		["10x"]: 0,
-		["100x"]: 0,
-		["1000x"]: 0,
-		["highest"]: 0
-	}
-	for (const item of dump) {
-		const crash = parseFloat(item.crash);
-		if (item.crash === "1.00") { stats["1x"]++; }
-		if (crash < 1.25) { stats["1.25x"]++; }
-		if (crash < 1.50) { stats["1.50x"]++; }
-		if (crash < 1.75) { stats["1.75x"]++; }
-		if (crash < 2) { stats["2x"]++; }
-		if (crash >= 10) { stats["10x"]++; }
-		if (crash >= 100) { stats["100x"]++; }
-		if (crash >= 1000) { stats["1000x"]++; }
-		if (crash >= stats.highest) { stats.highest = crash }
-	}
-	for (const index in stats) {
-		console.log(`${index}: ${stats[index]} (${((stats[index] / dump.length) * 100).toFixed(2)}%)`);
-	}
-}
-
-function refreshTable(amount) {
-	var hash = "f2a6edbf01e482c3ff7b4f5633261e3f39de756373e3069b2a51241bfc0f6333";
-  var lastHash = "";
+function refreshJSON(hash, amount) {
+	let lastHash = "";
 
 	const output = [];
 	let total = 0;
@@ -140,10 +109,10 @@ function refreshTable(amount) {
 		none: 0
 	}
 
-  for (var i = 0; i < amount; i++) {
-    var gameHash = (lastHash != "" ? genGameHash(lastHash) : hash);
-    var gameCrash = crashPointFromHash((lastHash != "" ? genGameHash(lastHash) : hash));
-    output.push({
+	for (var i = 0; i < amount; i++) {
+		var gameHash = (lastHash != "" ? genGameHash(lastHash) : hash);
+		var gameCrash = crashPointFromHash((lastHash != "" ? genGameHash(lastHash) : hash));
+		output.unshift({
 			hash,
 			crash: gameCrash
 		});
@@ -151,43 +120,43 @@ function refreshTable(amount) {
 		if (gameCrash === "1.00") {
 			counts.none++;
 		}
-    lastHash = gameHash;
+		lastHash = gameHash;
 		if (i % 10000 === 0) {
 			console.log(`${i} (${(i / amount) * 100}%) done!`);
 		}
-  }
-	fs.writeFileSync(`${__dirname}/dump_${amount}-${hash}.json`, JSON.stringify(output, null, 2));
+	}
+	fs.writeFileSync(`${__dirname}/dumps/dump_${amount}-${hash}.json`, JSON.stringify(output, null, 2));
 	console.log(`Processed ${amount} crashes - Average: ${total / amount} 1x's: ${counts.none} (${(counts.none / amount) * 100}%)`);
 }
 
 function divisible(hash, mod) {
-  var val = 0;
+	var val = 0;
 
-  var o = hash.length % 4;
-  for (var i = o > 0 ? o - 4 : 0; i < hash.length; i += 4) {
-    val = ((val << 16) + parseInt(hash.substring(i, i + 4), 16)) % mod;
-  }
+	var o = hash.length % 4;
+	for (var i = o > 0 ? o - 4 : 0; i < hash.length; i += 4) {
+		val = ((val << 16) + parseInt(hash.substring(i, i + 4), 16)) % mod;
+	}
 
-  return val === 0;
+	return val === 0;
 }
 
 function genGameHash(serverSeed) {
-  return CryptoJS.SHA256(serverSeed).toString()
+	return CryptoJS.SHA256(serverSeed).toString()
 };
 
 function hmac(key, v) {
-  var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
-  return hmacHasher.finalize(v).toString();
+	var hmacHasher = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
+	return hmacHasher.finalize(v).toString();
 }
 
 function crashPointFromHash(serverSeed) {
-  var hash = hmac(serverSeed, '30f05e6838d851bd137d082450296ba4d7f6e5a3119a61bebbc41798c05969b8');
+	var hash = hmac(serverSeed, '30f05e6838d851bd137d082450296ba4d7f6e5a3119a61bebbc41798c05969b8');
 
-  if (divisible(hash, 65))
-    return (1).toFixed(2);
+	if (divisible(hash, 65))
+		return (1).toFixed(2);
 
-  var h = parseInt(hash.slice(0, 52 / 4), 16);
-  var e = Math.pow(2, 52);
+	var h = parseInt(hash.slice(0, 52 / 4), 16);
+	var e = Math.pow(2, 52);
 
-  return (Math.max(1, (Math.floor((100 * e - h) / (e - h)) - 2) / 100)).toFixed(2);
+	return (Math.max(1, (Math.floor((100 * e - h) / (e - h)) - 2) / 100)).toFixed(2);
 };
