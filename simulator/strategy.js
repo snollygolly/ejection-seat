@@ -8,12 +8,12 @@ const starting = 5000;
 const DAY = 4250;
 
 const weeks = [];
-const weeksToSim = 20;
+const weeksToSim = 1;
 let i = 0;
 let wins = 0;
 let losses = 0;
 while (i < weeksToSim) {
-	const results = simulateStrategy((DAY * 7) * 2, 0);
+	const results = simulateStrategy((DAY * 7), 0);
 	weeks.push({
 		week: i,
 		wallet: results.wallet,
@@ -62,7 +62,7 @@ function simulateStrategy(duration, offset) {
 		})
 		stats.wallet = starting + ctx.total;
 
-		if (crash >= strategy.ctx.cashOut) {
+		if (crash >= ctx.cashOut) {
 			// we won
 			ctx = strategy.win({
 				e: { multiplier: crash},

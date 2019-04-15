@@ -57,13 +57,6 @@ if (typeof engine !== "undefined") {
 						config: BASE_CONFIG
 					});
 					break;
-				case 'IN_PROGRESS':
-					onStarted({
-						c: ctx,
-						e: engine,
-						config: BASE_CONFIG
-					});
-					break;
 				case 'ENDED':
 					onEnded({
 						c: ctx,
@@ -79,7 +72,7 @@ if (typeof engine !== "undefined") {
 const onStarting = (data) => {
 	data.c.started = true;
 	// start max checks
-	if (data.c.cashOut > data.config.MAX_CASHOUT) {
+	if (data.c.cashOut > data.config.MAX_CASHOUT && data.c.bet !== data.config.BASE_BET) {
 		if (data.c.logging === true) {
 			console.error(`!!! Cashout: ${data.c.cashOut.toFixed(0)} is greater than max cashout: ${data.config.MAX_CASHOUT}.  Increasing bet...`);
 		}
@@ -122,14 +115,10 @@ const onStarting = (data) => {
 		}
 	}
 	data.c.total -= data.c.bet;
-
+	if (data.c.logging === true) {
+		console.log(`--- No More Bets ---\n[total: ${data.c.total.toFixed(2)}]`);
+	}
 	return data.c;
-}
-
-// Cashout when you want or wait for auto cashout
-const onStarted = (data) => {
-	if (data.c.started !== true) { return; }
-	console.log(`--- No More Bets ---\n[total: ${data.c.total.toFixed(2)}]`);
 }
 
 // Do some analyse from results and adjust your next strategy
