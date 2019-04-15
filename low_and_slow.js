@@ -6,19 +6,19 @@ const BETTING = false;
 // The base amount you are betting.  This is where bets start at, and is how much we increment them
 const BASE_BET = 1;
 // This is the amount of profit you want to get.  If you bet 1, you want to get paid 1 + perc when successful.
-const BASE_PROFIT_PERC = 0.75;
+const BASE_PROFIT_PERC = 3;
 // When we lose a round, what should our new profit percentage be.
-const LOSS_PROFIT_PERC = BASE_PROFIT_PERC / 5;
+const LOSS_PROFIT_PERC = BASE_PROFIT_PERC / 6;
 // When we win a round, what should our profit increase be? 1 = 100% increase
 const WIN_PROFIT_INCREASE = 0.75;
 // This is the least amount we will ever cashout at
 const MIN_CASHOUT = 1.1;
 // This is the maximum amount of cashout you are willing to tolerate.
-const MAX_CASHOUT = 12;
+const MAX_CASHOUT = 10;
 // This is the maximum bet you are willing to tolerate
-const MAX_BET = 40;
+const MAX_BET = 30;
 // This is the maximum amount of loss you are willing to accept in a losing streak (before reverting to minimum bets/cashouts again)
-const MAX_COST = 350;
+const MAX_COST = 300;
 
 // -- don't change me
 let inGame = false;

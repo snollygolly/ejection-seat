@@ -1,33 +1,64 @@
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
 
-const dump = require("./dumps/dump_250000-921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1");
+const dump = require("./dumps/dump_1000000-921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1");
 
-//refreshJSON("921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1", 250000)
-// const results = simulateFlatSingle(2900, 60000);
-// console.log(results);
-simulateDump()
+const DAY = 4250;
+const STARTING = 7500;
+
+// refreshJSON("921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1", 1000000)
+
+const weeks = [];
+const weeksToSim = 10;
+let i = 0;
+let wins = 0;
+let losses = 0;
+while (i < weeksToSim) {
+	const results = simulateFlatSingle(2, (DAY * 7) * 2, (DAY * i));
+	weeks.push({
+		week: i,
+		wallet: results.wallet,
+		lowest: results.lowest,
+		longest: results.longest
+	});
+	if (results.wallet > STARTING && results.lowest > 0) {
+		wins++;
+	} else {
+		losses++;
+	}
+	i++;
+}
+
+console.log(weeks);
+console.log(`wins: ${wins} / losses: ${losses} [${(wins/losses) * 100}]`);
 
 
-function simulateFlatSingle(cashout, duration = dump.length) {
+// simulateDump()
+
+function simulateFlatSingle(cashout, duration = dump.length, offset = 0) {
+	const trimmedDump = JSON.parse(JSON.stringify(dump));
+	trimmedDump.splice(0, offset);
+	if (duration > trimmedDump.length) {
+		duration = trimmedDump.length;
+	}
 	const wins = [];
 	const stats = {
 		cashout: cashout,
-		wallet: 5000,
-		highest: 5000,
-		lowest: 5000,
+		wallet: STARTING,
+		highest: STARTING,
+		lowest: STARTING,
 		last: 0,
 		shortest: duration,
 		longest: 0
 	};
-	for (const [index, item] of dump.entries()) {
+	for (const [index, item] of trimmedDump.entries()) {
 		if (index > duration) {break;}
 		const crash = parseFloat(item.crash);
 		stats.wallet -= 1;
 		if (crash >= cashout) {
 			// we won
 			stats.wallet += 1 * cashout;
-			console.log(`Won on ${index} [crashed @ ${crash}]!  Your last win was ${((index - stats.last) / 4250).toFixed(2)} days ago.`);
+			//console.log(`Won on ${index} [crashed @ ${crash}]!  Your last win was ${((index - stats.last) / 4250).toFixed(2)} days ago.`);
 			if ((index - stats.last) < stats.shortest) {
 				stats.shortest = (index - stats.last);
 			}
@@ -48,7 +79,7 @@ function simulateFlatSingle(cashout, duration = dump.length) {
 	}
 	const delay = wins.reduce((acc, curr) => {
 		return acc + curr;
-	})
+	}, 0)
 	stats.score = (stats.longest * -1) + stats.lowest;
 	stats.avg = ((delay / wins.length) / 4250).toFixed(2);
 	stats.duration = (duration / 4250).toFixed(2);
