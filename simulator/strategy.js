@@ -14,7 +14,7 @@ const CYCLE_OFFSET = DAY;
 const LOGGING = false;
 
 const cycles = [];
-const cyclesToSim = 50;
+const cyclesToSim = 120;
 let i = 0;
 let wins = 0;
 let losses = 0;
@@ -48,6 +48,7 @@ while (i < cyclesToSim) {
 avgWallet = (avgWallet / i);
 avgLowest = (avgLowest / i);
 // console.log(cycles);
+console.log(`\n\nsimulating for ${cyclesToSim} x ${(CYCLE_DURATION / DAY).toFixed(2)} days`)
 console.log(`wins: ${wins} / losses: ${losses} [${((wins/losses) * 100).toFixed(2)}%]`);
 console.log(`average wallet after: ${avgWallet.toFixed(2)} (${(avgWallet - starting).toFixed(2)}) / average lowest after: ${avgLowest.toFixed(2)} (${(avgLowest - starting).toFixed(2)})`);
 console.log(`best win: ${bestWin.toFixed(2)} (${((bestWin / starting) * 100).toFixed(2)}%) / worst loss: ${worstLoss.toFixed(2)} (${((worstLoss / starting) * 100).toFixed(2)}%)`);

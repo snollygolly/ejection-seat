@@ -10,19 +10,19 @@ const BASE_CONFIG = {
 	BASE_BET: 1,
 
 	// This is the amount of profit you want to get.  If you bet 1, you want to get paid 1 + perc when successful.
-	BASE_PROFIT_PERC: 3,
+	BASE_PROFIT_PERC: 5,
 
 	// When we lose a round, what should our new profit percentage be.
-	LOSS_PROFIT_PERC: 0.20,
+	LOSS_PROFIT_PERC: 0.16,
 
 	// When we win a round, what should our profit increase be? 1 = 100% increase
-	WIN_PROFIT_INCREASE: 0.75,
+	WIN_PROFIT_INCREASE: 2.5,
 
 	// This is the least amount we will ever cashout at
 	MIN_CASHOUT: 1.1,
 
 	// This is the maximum amount of cashout you are willing to tolerate.
-	MAX_CASHOUT: 10,
+	MAX_CASHOUT: 8,
 
 	// This is the maximum bet you are willing to tolerate
 	MAX_BET: 35,
