@@ -13,7 +13,7 @@ const BASE_CONFIG = {
 	BASE_PROFIT_PERC: 3,
 
 	// When we lose a round, what should our new profit percentage be.
-	LOSS_PROFIT_PERC: 0.50,
+	LOSS_PROFIT_PERC: 0.20,
 
 	// When we win a round, what should our profit increase be? 1 = 100% increase
 	WIN_PROFIT_INCREASE: 0.75,
@@ -25,10 +25,10 @@ const BASE_CONFIG = {
 	MAX_CASHOUT: 10,
 
 	// This is the maximum bet you are willing to tolerate
-	MAX_BET: 30,
+	MAX_BET: 35,
 
 	// This is the maximum amount of loss you are willing to accept in a losing streak (before reverting to minimum bets/cashouts again)
-	MAX_COST: 300
+	MAX_COST: 350
 };
 
 // -- don't change me
@@ -77,7 +77,7 @@ const onStarting = (data) => {
 			console.error(`!!! Cashout: ${data.c.cashOut.toFixed(0)} is greater than max cashout: ${data.config.MAX_CASHOUT}.  Increasing bet...`);
 		}
 		while (data.c.cashOut > data.config.MAX_CASHOUT) {
-			data.c.profitMargin = data.config.BASE_PROFIT_PERC;
+			data.c.profitMargin = data.config.LOSS_PROFIT_PERC;
 			// increase bets every other round of losses
 			data.c.bet += data.config.BASE_BET;
 			const desiredProfit = (data.c.cost + data.c.bet) * (1 + data.c.profitMargin);
@@ -153,6 +153,10 @@ const onWin = (data) => {
 	data.c.cost = 0;
 	data.c.bet = data.config.BASE_BET;
 	data.c.profitMargin = data.c.profitMargin + (data.c.profitMargin * data.config.WIN_PROFIT_INCREASE);
+	// check for minimums from a previous loss
+	if (data.c.profitMargin < data.config.BASE_PROFIT_PERC) {
+		data.c.profitMargin = data.config.BASE_PROFIT_PERC;
+	}
 	data.c.cashOut = 1 * (1 + data.c.profitMargin);
 
 	return data.c;
@@ -164,10 +168,10 @@ const onLose = (data) => {
 		console.log(`${data.config.BETTING === true ? "+" : "?"} You lost!\nCrashed @ ${data.e.multiplier} - Lost ${data.c.bet.toFixed(0)} [cost: ${data.c.cost.toFixed(2)}]`);
 	}
 	// reset the profit margin to base when we lose, recoup losses
-	data.c.profitMargin = data.config.BASE_PROFIT_PERC;
+	data.c.profitMargin = data.config.LOSS_PROFIT_PERC;
 	// increase bets every other round of losses
 	data.c.bet += data.c.streak % 2 === 1 ? data.config.BASE_BET : 0;
-	const desiredProfit = (data.c.cost + data.c.bet) * (1 + data.config.LOSS_PROFIT_PERC);
+	const desiredProfit = (data.c.cost + data.c.bet) * (1 + data.c.profitMargin);
 	data.c.cashOut = desiredProfit / data.c.bet >= data.config.MIN_CASHOUT ? desiredProfit / data.c.bet : data.config.MIN_CASHOUT;
 
 	return data.c;

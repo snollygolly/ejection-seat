@@ -5,19 +5,29 @@ const dump = require("./dumps/dump_1000000-921e7866f7febd629a162818ecd9b62cd63e9
 const strategy = require("./strategies/low_and_slow");
 const starting = 5000;
 
-const DAY = 4250;
+const HOUR = 175
+const DAY = HOUR * 24;
 
-const weeks = [];
-const weeksToSim = 1;
+const CYCLE_DURATION = DAY * 1;
+const CYCLE_OFFSET = DAY;
+
+const LOGGING = false;
+
+const cycles = [];
+const cyclesToSim = 50;
 let i = 0;
 let wins = 0;
 let losses = 0;
-while (i < weeksToSim) {
-	const results = simulateStrategy((DAY * 7), 0);
-	weeks.push({
+let bestWin = 0;
+let worstLoss = starting;
+let avgWallet = 0;
+let avgLowest = 0;
+while (i < cyclesToSim) {
+	const results = simulateStrategy(CYCLE_DURATION, (CYCLE_OFFSET * i));
+	cycles.push({
 		week: i,
-		wallet: results.wallet,
-		lowest: results.lowest,
+		wallet: (results.wallet).toFixed(2),
+		lowest: (results.lowest).toFixed(2),
 		longest: results.longest
 	});
 	if (results.wallet > starting && results.lowest > 0) {
@@ -25,10 +35,22 @@ while (i < weeksToSim) {
 	} else {
 		losses++;
 	}
+	if (results.wallet - starting > bestWin) {
+		bestWin = results.wallet - starting;
+	}
+	if (results.wallet - starting < worstLoss) {
+		worstLoss = results.wallet - starting;
+	}
+	avgWallet += results.wallet;
+	avgLowest += results.lowest;
 	i++;
 }
-console.log(weeks);
-console.log(`wins: ${wins} / losses: ${losses} [${(wins/losses) * 100}]`);
+avgWallet = (avgWallet / i);
+avgLowest = (avgLowest / i);
+// console.log(cycles);
+console.log(`wins: ${wins} / losses: ${losses} [${((wins/losses) * 100).toFixed(2)}%]`);
+console.log(`average wallet after: ${avgWallet.toFixed(2)} (${(avgWallet - starting).toFixed(2)}) / average lowest after: ${avgLowest.toFixed(2)} (${(avgLowest - starting).toFixed(2)})`);
+console.log(`best win: ${bestWin.toFixed(2)} (${((bestWin / starting) * 100).toFixed(2)}%) / worst loss: ${worstLoss.toFixed(2)} (${((worstLoss / starting) * 100).toFixed(2)}%)`);
 
 
 
@@ -51,6 +73,7 @@ function simulateStrategy(duration, offset) {
 	};
 
 	let ctx = JSON.parse(JSON.stringify(strategy.ctx));
+	ctx.logging = LOGGING;
 	for (const [index, item] of trimmedDump.entries()) {
 		if (index > duration) {break;}
 		const crash = parseFloat(item.crash);
