@@ -2,7 +2,7 @@ const CryptoJS = require("crypto-js");
 const fs = require("fs");
 
 const dump = require("./dumps/dump_1000000-921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1");
-const strategy = require("./strategies/low_and_slow");
+const strategy = require("../strategies/martingale_plus");
 const starting = 5000;
 
 const HOUR = 175
