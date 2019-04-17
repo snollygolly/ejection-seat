@@ -35,7 +35,7 @@ const BASE_CONFIG = {
 const ctx = {
 	started: false,
 	logging: false,
-	log: (msg) => { console.log(message) },
+	log: (msg) => { console.log(msg) },
 	total: 0,
 	cost: 0,
 	bet: BASE_CONFIG.BASE_BET,
