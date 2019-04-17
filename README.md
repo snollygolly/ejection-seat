@@ -10,8 +10,8 @@ ETH - 0xb2921b476838c8DB9a29d708B3cA8c11959D7c7D
 LTC - LfkD8jcgv4E2rDta4hA2CUHNMiPGdZL1yr
 ```
 
-## Scripts
-`moonscript.js` is the older version of the script, it's not advised to use it.
+## Scripts (located in `strategies`)
+`martingale_plus` is a martingale style script that decreases cashouts as bets increase.
 `low_and_slow.js` is the newest version that should be used.
 
 ## Configuration

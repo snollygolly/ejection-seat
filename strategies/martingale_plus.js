@@ -27,6 +27,7 @@ const BASE_CONFIG = {
 const ctx = {
 	started: false,
 	logging: false,
+	log: (msg) => { console.log(message) },
 	total: 0,
 	cost: 0,
 	bet: BASE_CONFIG.BASE_BET,
@@ -65,7 +66,7 @@ const onStarting = (data) => {
 	// start max checks
 	if (data.c.bet > data.config.MAX_BET) {
 		if (data.c.logging === true) {
-			console.error(`!!! Bet: ${data.c.bet.toFixed(0)} is greater than max bet: ${data.config.MAX_BET}.  Resetting to base...`);
+			data.c.log(`!!! Bet: ${data.c.bet.toFixed(0)} is greater than max bet: ${data.config.MAX_BET}.  Resetting to base...`);
 		}
 		data.c.cost = 0;
 		data.c.bet = data.config.BASE_BET;
@@ -74,17 +75,17 @@ const onStarting = (data) => {
 	// start betting
 	data.c.cost += data.c.bet;
 	if (data.c.logging === true) {
-		console.log(`\n\n${data.config.BETTING === true ? "+" : "?"} Placed bet: ${data.c.bet.toFixed(0)} @ ${data.c.cashOut.toFixed(2)} for ${(data.c.bet * data.c.cashOut).toFixed(2)} return [cost: ${data.c.cost.toFixed(2)}]`);
+		data.c.log(`\n\n${data.config.BETTING === true ? "+" : "?"} Placed bet: ${data.c.bet.toFixed(0)} @ ${data.c.cashOut.toFixed(2)} for ${(data.c.bet * data.c.cashOut).toFixed(2)} return [cost: ${data.c.cost.toFixed(2)}]`);
 	}
 	if (data.e.balance >= data.c.bet) {
 		// place bet
 		if (data.config.BETTING === true) {
-			data.e.placeBet(data.c.bet, data.c.cashOut).catch(console.error);
+			data.e.placeBet(data.c.bet, data.c.cashOut).catch(data.c.log);
 		}
 	}
 	data.c.total -= data.c.bet;
 	if (data.c.logging === true) {
-		console.log(`--- No More Bets ---\n[total: ${data.c.total.toFixed(2)}]`);
+		data.c.log(`--- No More Bets ---\n[total: ${data.c.total.toFixed(2)}]`);
 	}
 	return data.c;
 }
@@ -115,7 +116,7 @@ const onWin = (data) => {
 	data.c.streak = 0;
 	// reset the bet, but increase the profit target
 	if (data.c.logging === true) {
-		console.log(`${data.config.BETTING === true ? "+" : "?"} You survived!\nBailed @ ${data.c.cashOut.toFixed(2)} / Crashed @ ${data.e.multiplier} - Got ${(data.c.bet * data.c.cashOut).toFixed(2)} (+${((data.c.bet * data.c.cashOut) - data.c.bet).toFixed(2)}) [cost: ${data.c.cost.toFixed(2)}]`);
+		data.c.log(`${data.config.BETTING === true ? "+" : "?"} You survived!\nBailed @ ${data.c.cashOut.toFixed(2)} / Crashed @ ${data.e.multiplier} - Got ${(data.c.bet * data.c.cashOut).toFixed(2)} (+${((data.c.bet * data.c.cashOut) - data.c.bet).toFixed(2)}) [cost: ${data.c.cost.toFixed(2)}]`);
 	}
 	data.c.total += (data.c.bet * data.c.cashOut);
 	data.c.cost = 0;
@@ -128,7 +129,7 @@ const onWin = (data) => {
 const onLose = (data) => {
 	data.c.streak++;
 	if (data.c.logging === true) {
-		console.log(`${data.config.BETTING === true ? "+" : "?"} You lost!\nCrashed @ ${data.e.multiplier} - Lost ${data.c.bet.toFixed(0)} [cost: ${data.c.cost.toFixed(2)}]`);
+		data.c.log(`${data.config.BETTING === true ? "+" : "?"} You lost!\nCrashed @ ${data.e.multiplier} - Lost ${data.c.bet.toFixed(0)} [cost: ${data.c.cost.toFixed(2)}]`);
 	}
 	// tick down cashout to reduce losses
 	if ((data.c.cashOut - data.config.CASHOUT_DECREMENT) > data.config.MIN_CASHOUT) {

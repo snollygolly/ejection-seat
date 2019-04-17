@@ -1,24 +1,25 @@
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
 
-const dump = require("./dumps/dump_1000000-921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1");
+const HOUR = 175
+const DAY = HOUR * 24;
+
+const hash = "921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1";
+const dump = require(`./dumps/dump_1000000-${hash}`);
 const strategy = require("../strategies/martingale_plus");
 const starting = 5000;
 
-const HOUR = 175
-const DAY = HOUR * 24;
+const LOGGING = false;
 
 const CYCLE_DURATION = DAY * 1;
 const CYCLE_OFFSET = DAY;
 
-const LOGGING = false;
-
 const cycles = [];
-const cyclesToSim = 120;
+const cyclesToSim = 30;
 let i = 0;
 let wins = 0;
 let losses = 0;
-let bestWin = 0;
+let bestWin = -9999999;
 let worstLoss = starting;
 let avgWallet = 0;
 let avgLowest = 0;
@@ -26,10 +27,14 @@ while (i < cyclesToSim) {
 	const results = simulateStrategy(CYCLE_DURATION, (CYCLE_OFFSET * i));
 	cycles.push({
 		week: i,
+		starting: starting,
 		wallet: (results.wallet).toFixed(2),
+		profit: (results.wallet - starting).toFixed(2),
+		highest: (results.highest).toFixed(2),
 		lowest: (results.lowest).toFixed(2),
 		longest: results.longest
 	});
+	console.log(`Finished Simulating ${i+1} of ${cyclesToSim}`);
 	if (results.wallet > starting && results.lowest > 0) {
 		wins++;
 	} else {
@@ -47,12 +52,17 @@ while (i < cyclesToSim) {
 }
 avgWallet = (avgWallet / i);
 avgLowest = (avgLowest / i);
-// console.log(cycles);
-console.log(`\n\nsimulating for ${cyclesToSim} x ${(CYCLE_DURATION / DAY).toFixed(2)} days`)
-console.log(`wins: ${wins} / losses: ${losses} [${((wins/losses) * 100).toFixed(2)}%]`);
-console.log(`average wallet after: ${avgWallet.toFixed(2)} (${(avgWallet - starting).toFixed(2)}) / average lowest after: ${avgLowest.toFixed(2)} (${(avgLowest - starting).toFixed(2)})`);
-console.log(`best win: ${bestWin.toFixed(2)} (${((bestWin / starting) * 100).toFixed(2)}%) / worst loss: ${worstLoss.toFixed(2)} (${((worstLoss / starting) * 100).toFixed(2)}%)`);
-
+const summary = `
+simulating for ${cyclesToSim} x ${(CYCLE_DURATION / DAY).toFixed(2)} days
+wins: ${wins} / losses: ${losses} [${((wins/cyclesToSim) * 100).toFixed(2)}%]
+average wallet after: ${avgWallet.toFixed(2)} (${(avgWallet - starting).toFixed(2)}) / average lowest after: ${avgLowest.toFixed(2)} (${(avgLowest - starting).toFixed(2)})
+best win: ${bestWin.toFixed(2)} (${((bestWin / starting) * 100).toFixed(2)}%) / worst loss: ${worstLoss.toFixed(2)} (${((worstLoss / starting) * 100).toFixed(2)}%)`;
+// write the summary to disk always
+fs.writeFileSync(`${__dirname}/output/final_${cyclesToSim}_${(CYCLE_DURATION / DAY).toFixed(2)}days_${hash.substring(0,3)}-${hash.substring(61, 64)}`, JSON.stringify({
+	summary,
+	cycles
+}, null, 2));
+console.log(summary);
 
 
 function simulateStrategy(duration, offset) {
@@ -75,6 +85,8 @@ function simulateStrategy(duration, offset) {
 
 	let ctx = JSON.parse(JSON.stringify(strategy.ctx));
 	ctx.logging = LOGGING;
+	ctx.logStash = [];
+	ctx.log = (message) => { ctx.logStash.push(message); };
 	for (const [index, item] of trimmedDump.entries()) {
 		if (index > duration) {break;}
 		const crash = parseFloat(item.crash);
@@ -111,7 +123,6 @@ function simulateStrategy(duration, offset) {
 				config: strategy.config
 			});
 		}
-
 		stats.wallet = starting + ctx.total;
 		// run wallet stats
 		if (stats.wallet < stats.lowest) {
@@ -126,6 +137,9 @@ function simulateStrategy(duration, offset) {
 	}, 0)
 	stats.avg = ((delay / wins.length) / 4250).toFixed(2) + " days";
 	stats.duration = (duration / 4250).toFixed(2) + " days";
-
+	// check to see if we should write this
+	if (LOGGING === true) {
+		fs.writeFileSync(`${__dirname}/output/sim_${i+1}of${cyclesToSim}_${(CYCLE_DURATION / DAY).toFixed(2)}days_${hash.substring(0,3)}-${hash.substring(61, 64)}`, ctx.logStash.join("\n"));
+	}
 	return stats;
 }
