@@ -4,18 +4,19 @@ const fs = require("fs");
 const HOUR = 175
 const DAY = HOUR * 24;
 
-const hash = "921e7866f7febd629a162818ecd9b62cd63e913a0d9e4e5fb8193253decd1dd1";
+//const hash = "b25e2319022a7184397feb4621a47bf52f5b0ce98e5782addaef96520c4bc260";
+const hash = "6791a52b80700c1ae9409f5fcff13a84b3de6c6a075dfcfc53cff1aa0cbd5ce4";
 const dump = require(`./dumps/dump_1000000-${hash}`);
 const strategy = require("../strategies/martingale_plus");
 const starting = 5000;
 
 const LOGGING = false;
 
-const CYCLE_DURATION = DAY * 1;
-const CYCLE_OFFSET = DAY;
+const CYCLE_DURATION = DAY * 1 / 24;
+const CYCLE_OFFSET = DAY / 24;
 
 const cycles = [];
-const cyclesToSim = 30;
+const cyclesToSim = 96;
 let i = 0;
 let wins = 0;
 let losses = 0;
@@ -34,7 +35,6 @@ while (i < cyclesToSim) {
 		lowest: (results.lowest).toFixed(2),
 		longest: results.longest
 	});
-	console.log(`Finished Simulating ${i+1} of ${cyclesToSim}`);
 	if (results.wallet > starting && results.lowest > 0) {
 		wins++;
 	} else {

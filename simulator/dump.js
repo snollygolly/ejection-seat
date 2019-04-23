@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const DAY = 4250;
 
-refreshJSON("6791a52b80700c1ae9409f5fcff13a84b3de6c6a075dfcfc53cff1aa0cbd5ce4", 1000000)
+refreshJSON("b25e2319022a7184397feb4621a47bf52f5b0ce98e5782addaef96520c4bc260", 2125)
 
 function refreshJSON(hash, amount) {
 	let lastHash = "";
@@ -22,7 +22,7 @@ function refreshJSON(hash, amount) {
 			crash: gameCrash
 		});
 		total += parseFloat(gameCrash);
-		if (gameCrash === "1.00") {
+		if (parseFloat(gameCrash) < 2) {
 			counts.none++;
 		}
 		lastHash = gameHash;

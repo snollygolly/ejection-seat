@@ -16,7 +16,7 @@ const BASE_CONFIG = {
 	CASHOUT_DECREMENT: 1,
 
 	// This is the least amount we will ever cashout at
-	MIN_CASHOUT: 2.25,
+	MIN_CASHOUT: 2.30,
 
 	// This is the maximum bet you are willing to tolerate
 	// 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
